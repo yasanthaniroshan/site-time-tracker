@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Validate manifest
+        run: |
+          jq . manifest.json > /dev/null
+          # Every file referenced by the manifest must exist.
+          jq -r '
+            [.icons[]?, .action.default_icon[]?, .background.service_worker?,
+             .options_ui.page?, (.content_scripts[]?.js[]?)] | .[]
+          ' manifest.json | while read -r f; do
+            test -f "$f" || { echo "::error::Missing file referenced in manifest: $f"; exit 1; }
+          done
+
+      - name: Syntax-check JavaScript
+        run: find src -name '*.js' -print0 | xargs -0 -n1 node --check

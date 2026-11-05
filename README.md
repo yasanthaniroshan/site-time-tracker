@@ -2,6 +2,16 @@
 
 A small Chrome extension (Manifest V3) that shows a floating card with how much time you've spent **today** on YouTube and LinkedIn, with a progress bar that fills every 5 minutes.
 
+## Screenshots
+
+<p>
+  <img src="screenshots/screenshot_1.png" alt="Expanded card showing time today with a progress bar" width="280">
+  &nbsp;&nbsp;
+  <img src="screenshots/screenshot_2.png" alt="Compact card with a green background" width="93">
+</p>
+
+<img src="screenshots/screenshot_3.png" alt="Settings page" width="600">
+
 ## Features
 
 - Floating card with total time today, a 5-minute progress bar, a block counter and a countdown to the next block

@@ -30,4 +30,14 @@ See the [Project structure](README.md#project-structure) section of the README.
 2. Commit with clear messages.
 3. Open a PR and fill in the template.
 
+## Releasing (maintainers)
+
+1. Move the **Unreleased** entries in `CHANGELOG.md` under a new `## [x.y.z]` heading.
+2. Bump `version` in `manifest.json` to `x.y.z`.
+3. Commit, then tag and push:
+   ```bash
+   git tag vx.y.z && git push origin vx.y.z
+   ```
+4. The **Release** workflow checks the tag matches the manifest, zips the extension, and publishes a GitHub Release using the changelog section as the notes.
+
 By contributing, you agree that your contributions are licensed under the [MIT License](LICENSE) and that you will follow the [Code of Conduct](CODE_OF_CONDUCT.md).
