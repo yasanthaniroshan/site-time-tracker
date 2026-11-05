@@ -5,19 +5,20 @@ A small Chrome extension (Manifest V3) that shows a floating card with how much 
 ## Features
 
 - Floating card with total time today, a 5-minute progress bar, a block counter and a countdown to the next block
-- Bar colour shifts from green to orange (10 min) to red (20 min) as the day's total grows
+- Bar colour shifts from green to orange to red as the day's total grows (by default after 2 and 4 blocks)
 - Time is saved per site and per day, so it survives page refreshes, new tabs and browser restarts
 - Only counts time while the tab is visible
 - Resets automatically at local midnight
-- Click the card to minimize or expand it
+- Click the card to minimize or expand it. The compact card's background follows the state (green / orange / red).
+- Settings page (click the toolbar icon): enable or disable each site, block length, colour thresholds, card position, start minimized
 - Light and dark mode (follows your system setting)
-- All data stays on your machine in `chrome.storage.local`. Nothing is sent anywhere.
+- Time data stays on your machine in `chrome.storage.local`. Settings are stored in `chrome.storage.sync` (your Chrome profile). Nothing is sent to any other server.
 
 ## Install (from source)
 
 1. Clone this repo:
    ```bash
-   git clone <your-repo-url>
+   git clone https://github.com/yasanthaniroshan/site-time-tracker
    ```
 2. Open `chrome://extensions` in Chrome.
 3. Turn on **Developer mode** (top right).
@@ -34,17 +35,21 @@ After changing code, click the reload icon on the extension's card in `chrome://
 ├── README.md
 ├── icons/                 # Extension icons (icon.svg is the source)
 └── src/
-    └── content/
-        ├── config.js      # Tracked sites and block length
-        ├── widget.js      # Floating card UI (shadow DOM)
-        └── tracker.js     # Time tracking and storage logic
+    ├── background.js      # Opens the settings page when the toolbar icon is clicked
+    ├── content/
+    │   ├── config.js      # Tracked sites, default settings, settings load/save
+    │   ├── widget.js      # Floating card UI (shadow DOM)
+    │   └── tracker.js     # Time tracking and storage logic
+    └── options/
+        ├── options.html   # Settings page
+        └── options.js
 ```
 
-The three content scripts share one global scope and are loaded in the order listed in `manifest.json`. They communicate through a `SiteTimer` namespace.
+The three content scripts share one global scope and are loaded in the order listed in `manifest.json`. They communicate through a `SiteTimer` namespace, which the settings page also uses.
 
 ## Customize
 
-**Change the block length:** edit `BLOCK_MS` in `src/content/config.js`.
+**Change settings:** click the extension's toolbar icon to open the settings page. Changes apply instantly to open tabs.
 
 **Track another site:**
 1. Add `{ name: "Reddit", domain: "reddit.com" }` to `SITES` in `src/content/config.js`.

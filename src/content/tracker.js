@@ -1,10 +1,13 @@
 // Entry point: tracks time spent today on the current site and persists it
 // in chrome.storage.local so it survives refreshes, new tabs and restarts.
+// User settings live in chrome.storage.sync (edited on the options page).
 (async () => {
   const site = SiteTimer.findSite(location.hostname);
   if (!site) return; // Safety guard: only run on tracked sites.
 
-  const widget = SiteTimer.createWidget(site.name);
+  let settings = await SiteTimer.loadSettings();
+  const widget = SiteTimer.createWidget(site.name, settings);
+  widget.applySettings(settings);
 
   // Local date, so the total resets at local midnight.
   const storageKey = () => {
@@ -19,10 +22,17 @@
   let elapsed = (await chrome.storage.local.get(key))[key] || 0;
   let last = Date.now();
 
-  // Pick up time added by other tabs of the same site.
-  chrome.storage.onChanged.addListener((changes) => {
-    const change = changes[key];
-    if (change && change.newValue > elapsed) elapsed = change.newValue;
+  chrome.storage.onChanged.addListener((changes, area) => {
+    // Settings edited on the options page: apply instantly.
+    if (area === "sync" && changes[SiteTimer.SETTINGS_KEY]) {
+      settings = SiteTimer.normalize(changes[SiteTimer.SETTINGS_KEY].newValue);
+      widget.applySettings(settings);
+      widget.render(elapsed, settings);
+    }
+    // Time added by another tab of the same site.
+    if (area === "local" && changes[key] && changes[key].newValue > elapsed) {
+      elapsed = changes[key].newValue;
+    }
   });
 
   const tick = () => {
@@ -33,7 +43,8 @@
       elapsed = 0;
     }
 
-    if (!document.hidden) { // only count time while the tab is visible
+    // Count only while this site is enabled and the tab is visible.
+    if (settings.sites[site.name] && !document.hidden) {
       elapsed += now - last;
       try {
         chrome.storage.local.set({ [key]: elapsed });
@@ -43,7 +54,7 @@
     }
 
     last = now;
-    widget.render(elapsed);
+    widget.render(elapsed, settings);
   };
 
   tick();
