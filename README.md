@@ -61,6 +61,10 @@ The three content scripts share one global scope and are loaded in the order lis
 - If the same site is visible in two windows at once (for example side by side), both add time, so it double counts.
 - Tabs that were open before you reloaded the extension keep running the old script until refreshed.
 
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). Report security issues as described in [SECURITY.md](SECURITY.md).
+
 ## License
 
-Add a license of your choice (for example MIT) before publishing.
+[MIT](LICENSE)
